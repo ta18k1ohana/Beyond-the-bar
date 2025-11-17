@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+/* Coffee-themed color palette from PRD */
+@theme {
+  /* Colors */
+  --color-coffee-primary: #8B4513; /* Saddle Brown */
+  --color-coffee-secondary: #D2691E; /* Chocolate */
+  --color-coffee-accent: #DAA520; /* Goldenrod */
+  --color-coffee-bg: #FFF8DC; /* Cornsilk */
+  --color-coffee-text: #2F2F2F; /* Dark gray */
+  --color-coffee-success: #6B8E23; /* Olive green */
+  --color-coffee-error: #CD5C5C; /* Indian red */
+
+  /* Badge colors */
+  --color-badge-bronze: #CD7F32;
+  --color-badge-silver: #C0C0C0;
+  --color-badge-gold: #FFD700;
+  --color-badge-legendary: #9D4EDD;
+
+  /* Typography */
+  --font-heading: 'Inter', 'Poppins', system-ui, sans-serif;
+  --font-body: 'Open Sans', system-ui, -apple-system, sans-serif;
+  --font-accent: 'Satisfy', 'Pacifico', cursive;
+
+  /* Spacing & Sizing */
+  --min-tap-target: 44px;
+}
+
+/* Base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-coffee-bg);
+  color: var(--color-coffee-text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+/* Custom utility classes for badge levels */
+.badge-bronze {
+  color: var(--color-badge-bronze);
+}
+
+.badge-silver {
+  color: var(--color-badge-silver);
+}
+
+.badge-gold {
+  color: var(--color-badge-gold);
+}
+
+.badge-legendary {
+  color: var(--color-badge-legendary);
+  background: linear-gradient(135deg, #9D4EDD 0%, #7209B7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
