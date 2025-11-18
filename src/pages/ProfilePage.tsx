@@ -6,6 +6,7 @@ import { ProfileCompletion } from '../components/profile/ProfileCompletion';
 import { EditBasicInfo } from '../components/profile/EditBasicInfo';
 import { WorkHistoryManager } from '../components/profile/WorkHistoryManager';
 import { CertificationManager } from '../components/profile/CertificationManager';
+import { ProfilePhotoUpload } from '../components/profile/ProfilePhotoUpload';
 import { ReviewList } from '../components/reviews/ReviewList';
 import { getPendingVerifications } from '../services/review.service';
 
@@ -39,6 +40,13 @@ export const ProfilePage = () => {
     }
   };
 
+  const handlePhotoUpdate = (_newPhotoURL: string) => {
+    // Refresh profile to show new photo
+    if (user) {
+      fetchUserProfile(user.uid);
+    }
+  };
+
   if (!user) {
     return (
       <div className="text-center py-12">
@@ -62,20 +70,16 @@ export const ProfilePage = () => {
         <div className="lg:col-span-2 space-y-6">
           {/* Header Card */}
           <div className="bg-white rounded-lg shadow-md p-8">
-            <div className="flex items-start gap-6">
-              {/* Profile Photo */}
-              <div className="w-24 h-24 bg-[var(--color-coffee-accent)] rounded-full flex items-center justify-center text-4xl text-white flex-shrink-0">
-                {userProfile.profilePhoto ? (
-                  <img
-                    src={userProfile.profilePhoto}
-                    alt={userProfile.name}
-                    className="w-full h-full rounded-full object-cover"
-                  />
-                ) : (
-                  userProfile.name.charAt(0).toUpperCase()
-                )}
-              </div>
+            {/* Profile Photo Upload */}
+            <div className="mb-6">
+              <ProfilePhotoUpload
+                userId={user.uid}
+                currentPhotoURL={userProfile.profilePhoto}
+                onPhotoUpdate={handlePhotoUpdate}
+              />
+            </div>
 
+            <div className="flex items-start gap-6">
               {/* Basic Info */}
               <div className="flex-1">
                 <h1 className="text-3xl font-bold text-[var(--color-coffee-primary)] font-heading">
