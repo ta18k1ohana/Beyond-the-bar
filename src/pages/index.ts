@@ -2,4 +2,7 @@ export * from './Home';
 export * from './Login';
 export * from './SignUp';
 export * from './Profile';
+export * from './ProfilePage';
+export * from './ProfileOnboarding';
+export * from './Settings';
 export * from './Jobs';

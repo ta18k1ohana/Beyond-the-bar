@@ -7,6 +7,7 @@ import {
   type User
 } from 'firebase/auth';
 import { auth } from '../config/firebase';
+import { createUserProfile } from './user.service';
 
 /**
  * Authentication service for Beyond The Bar
@@ -26,20 +27,25 @@ export interface SignInData {
 }
 
 /**
- * Register a new user
+ * Register a new user and create their Firestore profile
  */
-export const signUp = async ({ email, password, name }: SignUpData): Promise<User> => {
+export const signUp = async ({ email, password, name, userType }: SignUpData): Promise<User> => {
   try {
+    // Create Firebase Auth user
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    // Update user profile with display name
+    // Update Firebase Auth profile with display name
     await updateProfile(user, {
       displayName: name
     });
 
-    // Note: Additional user data (userType, etc.) should be stored in Firestore
-    // This will be handled by the user service when we implement user profiles
+    // Create Firestore user profile
+    await createUserProfile(user.uid, {
+      name,
+      email,
+      type: userType
+    });
 
     return user;
   } catch (error: any) {

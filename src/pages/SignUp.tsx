@@ -44,7 +44,7 @@ export const SignUp = () => {
         name: data.name,
         userType: data.userType
       });
-      navigate('/profile');
+      navigate('/onboarding');
     } catch (err: any) {
       setError(err.message || 'Failed to create account');
     } finally {
