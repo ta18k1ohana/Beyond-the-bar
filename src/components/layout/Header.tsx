@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useUserStore } from '../../store/userStore';
 import { signOut } from '../../services/auth.service';
 import { NotificationBell } from '../notifications/NotificationBell';
 
 export const Header = () => {
   const { user } = useAuth();
+  const { userProfile } = useUserStore();
 
   const handleSignOut = async () => {
     try {
@@ -33,6 +35,12 @@ export const Header = () => {
             <Link to="/jobs" className="hover:text-[var(--color-coffee-accent)] transition-colors">
               Jobs
             </Link>
+
+            {userProfile?.type === 'employer' && (
+              <Link to="/analytics" className="hover:text-[var(--color-coffee-accent)] transition-colors">
+                Analytics
+              </Link>
+            )}
 
             {user ? (
               <>

@@ -10,3 +10,4 @@ export * from './GiveReview';
 export * from './VerifyReviews';
 export * from './BadgesPage';
 export * from './NotificationsPage';
+export * from './AnalyticsPage';
