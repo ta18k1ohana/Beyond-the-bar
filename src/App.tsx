@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Layout } from './components/layout';
-import { Home, Login, SignUp, ProfilePage, ProfileOnboarding, Settings, Jobs } from './pages';
+import { Home, Login, SignUp, ProfilePage, ProfileOnboarding, Settings, Jobs, GiveReview, VerifyReviews } from './pages';
 
 // Protected route wrapper
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -89,6 +89,24 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <Settings />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/give-review"
+          element={
+            <ProtectedRoute>
+              <GiveReview />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/verify-reviews"
+          element={
+            <ProtectedRoute>
+              <VerifyReviews />
             </ProtectedRoute>
           }
         />

@@ -6,21 +6,36 @@ import { ProfileCompletion } from '../components/profile/ProfileCompletion';
 import { EditBasicInfo } from '../components/profile/EditBasicInfo';
 import { WorkHistoryManager } from '../components/profile/WorkHistoryManager';
 import { CertificationManager } from '../components/profile/CertificationManager';
+import { ReviewList } from '../components/reviews/ReviewList';
+import { getPendingVerifications } from '../services/review.service';
 
 export const ProfilePage = () => {
   const { user } = useAuth();
   const { userProfile, fetchUserProfile, loading } = useUserStore();
   const [editingBasicInfo, setEditingBasicInfo] = useState(false);
+  const [pendingVerificationCount, setPendingVerificationCount] = useState(0);
 
   useEffect(() => {
     if (user) {
       fetchUserProfile(user.uid);
+      loadPendingVerifications();
     }
   }, [user, fetchUserProfile]);
+
+  const loadPendingVerifications = async () => {
+    if (!user) return;
+    try {
+      const pending = await getPendingVerifications(user.uid);
+      setPendingVerificationCount(pending.length);
+    } catch (error) {
+      console.error('Error loading pending verifications:', error);
+    }
+  };
 
   const handleRefresh = () => {
     if (user) {
       fetchUserProfile(user.uid);
+      loadPendingVerifications();
     }
   };
 
@@ -215,6 +230,22 @@ export const ProfilePage = () => {
               onUpdate={handleRefresh}
             />
           </div>
+
+          {/* Reviews */}
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-[var(--color-coffee-primary)] font-heading">
+                Reviews
+              </h2>
+              <Link
+                to="/give-review"
+                className="text-[var(--color-coffee-accent)] hover:underline text-sm font-semibold"
+              >
+                + Add Review for Someone
+              </Link>
+            </div>
+            <ReviewList userId={user.uid} isOwner={true} limit={5} />
+          </div>
         </div>
 
         {/* Right Column - Sidebar */}
@@ -229,17 +260,22 @@ export const ProfilePage = () => {
             </h3>
             <div className="space-y-3">
               <Link
-                to="/request-review"
-                className="block w-full bg-[var(--color-coffee-accent)] text-[var(--color-coffee-text)] text-center px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity"
-              >
-                Request a Review
-              </Link>
-              <Link
                 to="/give-review"
                 className="block w-full bg-[var(--color-coffee-primary)] text-white text-center px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity"
               >
                 Give a Review
               </Link>
+              {pendingVerificationCount > 0 && (
+                <Link
+                  to="/verify-reviews"
+                  className="block w-full bg-[var(--color-coffee-accent)] text-[var(--color-coffee-text)] text-center px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity relative"
+                >
+                  Verify Reviews
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                    {pendingVerificationCount}
+                  </span>
+                </Link>
+              )}
               <Link
                 to="/settings"
                 className="block w-full bg-gray-200 text-gray-700 text-center px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-colors"

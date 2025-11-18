@@ -6,3 +6,5 @@ export * from './ProfilePage';
 export * from './ProfileOnboarding';
 export * from './Settings';
 export * from './Jobs';
+export * from './GiveReview';
+export * from './VerifyReviews';
