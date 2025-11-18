@@ -8,3 +8,5 @@ export * from './Settings';
 export * from './Jobs';
 export * from './GiveReview';
 export * from './VerifyReviews';
+export * from './BadgesPage';
+export * from './NotificationsPage';

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { signOut } from '../../services/auth.service';
+import { NotificationBell } from '../notifications/NotificationBell';
 
 export const Header = () => {
   const { user } = useAuth();
@@ -26,12 +27,16 @@ export const Header = () => {
             <Link to="/" className="hover:text-[var(--color-coffee-accent)] transition-colors">
               Home
             </Link>
+            <Link to="/badges" className="hover:text-[var(--color-coffee-accent)] transition-colors">
+              Badges
+            </Link>
             <Link to="/jobs" className="hover:text-[var(--color-coffee-accent)] transition-colors">
               Jobs
             </Link>
 
             {user ? (
               <>
+                <NotificationBell />
                 <Link
                   to="/profile"
                   className="hover:text-[var(--color-coffee-accent)] transition-colors"
