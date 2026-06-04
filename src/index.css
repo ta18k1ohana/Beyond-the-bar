@@ -1,69 +1,148 @@
 @import "tailwindcss";
 
-/* Coffee-themed color palette from PRD */
+/*
+ * Beyond The Bar — vintage editorial + Apple-glass minimalism.
+ * Neutral by design so it sits comfortably alongside any café's own brand.
+ */
 @theme {
-  /* Colors */
-  --color-coffee-primary: #8B4513; /* Saddle Brown */
-  --color-coffee-secondary: #D2691E; /* Chocolate */
-  --color-coffee-accent: #DAA520; /* Goldenrod */
-  --color-coffee-bg: #FFF8DC; /* Cornsilk */
-  --color-coffee-text: #2F2F2F; /* Dark gray */
-  --color-coffee-success: #6B8E23; /* Olive green */
-  --color-coffee-error: #CD5C5C; /* Indian red */
+  /* Neutral surface palette */
+  --color-paper: #F5F1EA;        /* warm off-white, primary background */
+  --color-paper-2: #ECE6DB;      /* slightly deeper card tone */
+  --color-ink: #1A1815;          /* near-black for type */
+  --color-ink-soft: #4A4641;     /* secondary text */
+  --color-hairline: #D9D2C5;     /* 1px dividers / borders */
 
-  /* Badge colors */
-  --color-badge-bronze: #CD7F32;
-  --color-badge-silver: #C0C0C0;
-  --color-badge-gold: #FFD700;
-  --color-badge-legendary: #9D4EDD;
+  /* Single muted accent — faded oxblood. Restrained, vintage. */
+  --color-accent: #7A2E2A;
+  --color-accent-soft: #B5746F;
+
+  /* Glass surfaces */
+  --glass-bg: rgba(255, 252, 246, 0.55);
+  --glass-bg-strong: rgba(255, 252, 246, 0.75);
+  --glass-border: rgba(26, 24, 21, 0.08);
+
+  /* Legacy coffee tokens kept as aliases so existing components don't break.
+     They'll get cleaned up as each surface is migrated. */
+  --color-coffee-primary: var(--color-ink);
+  --color-coffee-secondary: var(--color-ink-soft);
+  --color-coffee-accent: var(--color-accent);
+  --color-coffee-bg: var(--color-paper);
+  --color-coffee-text: var(--color-ink);
+  --color-coffee-success: #5C6B4A;
+  --color-coffee-error: #8A3A36;
+
+  /* Badge tones — desaturated to match the new palette */
+  --color-badge-bronze: #9C6B3F;
+  --color-badge-silver: #9A9A92;
+  --color-badge-gold: #B89150;
+  --color-badge-legendary: #6B4A7A;
 
   /* Typography */
-  --font-heading: 'Inter', 'Poppins', system-ui, sans-serif;
-  --font-body: 'Open Sans', system-ui, -apple-system, sans-serif;
-  --font-accent: 'Satisfy', 'Pacifico', cursive;
+  --font-heading: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-accent: 'Fraunces', Georgia, serif;
 
-  /* Spacing & Sizing */
   --min-tap-target: 44px;
 }
 
-/* Base styles */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+html, body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+}
+
 body {
   font-family: var(--font-body);
-  background-color: var(--color-coffee-bg);
-  color: var(--color-coffee-text);
+  font-weight: 400;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.005em;
+  min-height: 100vh;
+
+  /* Faint paper grain — pure CSS, no asset. */
+  background-image:
+    radial-gradient(rgba(26, 24, 21, 0.035) 1px, transparent 1px),
+    radial-gradient(rgba(26, 24, 21, 0.025) 1px, transparent 1px);
+  background-size: 3px 3px, 7px 7px;
+  background-position: 0 0, 1px 2px;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
-  font-weight: 600;
-  line-height: 1.2;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
 }
 
-/* Custom utility classes for badge levels */
-.badge-bronze {
-  color: var(--color-badge-bronze);
+/* Small-caps editorial label, used for eyebrows / section tags */
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
 }
 
-.badge-silver {
-  color: var(--color-badge-silver);
+/* Glass surface utility */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
 }
 
-.badge-gold {
-  color: var(--color-badge-gold);
+.glass-strong {
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid var(--glass-border);
 }
 
+.hairline {
+  border-color: var(--color-hairline);
+}
+
+/* Buttons */
+.btn-primary {
+  background: var(--color-ink);
+  color: var(--color-paper);
+  padding: 0.7rem 1.4rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  transition: transform 120ms ease, background 120ms ease;
+}
+.btn-primary:hover { background: #000; transform: translateY(-1px); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-ink);
+  padding: 0.7rem 1.4rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: 1px solid var(--color-hairline);
+  transition: background 120ms ease;
+}
+.btn-ghost:hover { background: rgba(26, 24, 21, 0.04); }
+
+/* Badge color helpers (kept for existing components) */
+.badge-bronze { color: var(--color-badge-bronze); }
+.badge-silver { color: var(--color-badge-silver); }
+.badge-gold { color: var(--color-badge-gold); }
 .badge-legendary {
   color: var(--color-badge-legendary);
-  background: linear-gradient(135deg, #9D4EDD 0%, #7209B7 100%);
+  background: linear-gradient(135deg, #6B4A7A 0%, #4A2E5A 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

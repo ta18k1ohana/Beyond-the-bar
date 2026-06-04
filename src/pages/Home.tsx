@@ -1,115 +1,136 @@
 import { Link } from 'react-router-dom';
 
+const Icon = ({ d }: { d: string }) => (
+  <svg
+    viewBox="0 0 24 24"
+    width="22"
+    height="22"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.25"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden
+  >
+    <path d={d} />
+  </svg>
+);
+
+// Thin line icons — restrained, no emoji.
+const ICON_SEAL =
+  'M12 3l2.4 2.1 3.1-.5.9 3 2.6 1.8-1 3 1 3-2.6 1.8-.9 3-3.1-.5L12 21l-2.4-2.1-3.1.5-.9-3L3 14.6l1-3-1-3 2.6-1.8.9-3 3.1.5L12 3z M9.5 12.2l2 2 3.5-4';
+const ICON_QUILL =
+  'M4 20l8-8 M12 12l6-6a3 3 0 10-4-4l-6 6 M14 6l4 4';
+const ICON_DOOR =
+  'M5 21V5a2 2 0 012-2h7a2 2 0 012 2v16 M5 21h12 M13 12h.5';
+
 export const Home = () => {
   return (
-    <div className="space-y-12">
-      {/* Hero Section */}
-      <section className="text-center py-16">
-        <h1 className="text-5xl font-bold text-[var(--color-coffee-primary)] mb-6 font-heading">
-          Beyond The Bar
+    <div className="space-y-28">
+      {/* Hero */}
+      <section className="pt-12 pb-8">
+        <p className="eyebrow mb-6">A professional record · for baristas</p>
+        <h1
+          className="font-heading text-[clamp(2.75rem,7vw,5.5rem)] leading-[0.95] max-w-4xl"
+          style={{ fontVariationSettings: '"opsz" 144' }}
+        >
+          The craft behind
+          <span className="italic text-[var(--color-accent)]"> the cup</span>,
+          <br />
+          quietly kept.
         </h1>
-        <p className="text-xl text-[var(--color-coffee-text)] mb-8 max-w-2xl mx-auto">
-          Showcase your barista skills, earn recognition through badges,
-          and connect with opportunities in the coffee community.
+        <p className="mt-8 max-w-xl text-lg text-[var(--color-ink-soft)] leading-relaxed">
+          Build a profile that travels with you — your stations, your training, the
+          people who&rsquo;ve worked beside you. Designed to sit gracefully alongside
+          whichever café you call home.
         </p>
-        <div className="flex gap-4 justify-center">
-          <Link
-            to="/signup"
-            className="bg-[var(--color-coffee-accent)] text-[var(--color-coffee-text)] px-8 py-3 rounded-lg text-lg font-semibold hover:opacity-90 transition-opacity"
-          >
-            Create Your Profile
+        <div className="mt-10 flex flex-wrap gap-3">
+          <Link to="/signup" className="btn-primary">
+            Begin your profile
           </Link>
-          <Link
-            to="/jobs"
-            className="bg-[var(--color-coffee-primary)] text-white px-8 py-3 rounded-lg text-lg font-semibold hover:opacity-90 transition-opacity"
-          >
-            Browse Jobs
+          <Link to="/jobs" className="btn-ghost">
+            Browse positions
           </Link>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="grid md:grid-cols-3 gap-8">
-        <div className="text-center p-6 bg-white rounded-lg shadow-md">
-          <div className="text-4xl mb-4">🏆</div>
-          <h3 className="text-xl font-bold mb-2 text-[var(--color-coffee-primary)] font-heading">
-            Badge System
-          </h3>
-          <p className="text-[var(--color-coffee-text)]">
-            Earn Bronze, Silver, Gold, and Legendary badges for your expertise.
-            From Latte Art Wizard to Espresso Alchemist.
-          </p>
+      {/* Three pillars */}
+      <section>
+        <div className="flex items-end justify-between mb-10">
+          <h2 className="font-heading text-3xl">What it holds</h2>
+          <span className="eyebrow hidden sm:inline">Three pillars</span>
         </div>
-
-        <div className="text-center p-6 bg-white rounded-lg shadow-md">
-          <div className="text-4xl mb-4">⭐</div>
-          <h3 className="text-xl font-bold mb-2 text-[var(--color-coffee-primary)] font-heading">
-            Peer Recognition
-          </h3>
-          <p className="text-[var(--color-coffee-text)]">
-            Get recognized by colleagues, managers, and industry professionals.
-            Build your reputation through verified reviews.
-          </p>
-        </div>
-
-        <div className="text-center p-6 bg-white rounded-lg shadow-md">
-          <div className="text-4xl mb-4">💼</div>
-          <h3 className="text-xl font-bold mb-2 text-[var(--color-coffee-primary)] font-heading">
-            Job Matching
-          </h3>
-          <p className="text-[var(--color-coffee-text)]">
-            Connect with cafés looking for baristas with your specific skills.
-            Find opportunities that match your expertise.
-          </p>
+        <div className="grid md:grid-cols-3 gap-6">
+          {[
+            {
+              icon: ICON_SEAL,
+              label: 'Marks of craft',
+              body:
+                'Quiet badges earned over time — latte work, sourcing, training others — never loud, always specific.',
+            },
+            {
+              icon: ICON_QUILL,
+              label: 'Words from peers',
+              body:
+                'Reviews from the people who actually worked the bar with you. Tiered for credibility, not vanity.',
+            },
+            {
+              icon: ICON_DOOR,
+              label: 'Open doors',
+              body:
+                'A neutral place for cafés to find baristas whose skills fit the room — without the noise of a job board.',
+            },
+          ].map((card) => (
+            <article key={card.label} className="glass p-7 transition-transform hover:-translate-y-0.5">
+              <div className="text-[var(--color-ink)] mb-6">
+                <Icon d={card.icon} />
+              </div>
+              <h3 className="font-heading text-xl mb-2">{card.label}</h3>
+              <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
+                {card.body}
+              </p>
+            </article>
+          ))}
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="bg-white rounded-lg shadow-md p-8">
-        <h2 className="text-3xl font-bold text-center mb-8 text-[var(--color-coffee-primary)] font-heading">
-          How It Works
-        </h2>
-        <div className="grid md:grid-cols-4 gap-6">
-          <div className="text-center">
-            <div className="w-12 h-12 bg-[var(--color-coffee-accent)] text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
-              1
-            </div>
-            <h4 className="font-bold mb-2 font-heading">Create Profile</h4>
-            <p className="text-sm text-[var(--color-coffee-text)]">
-              Sign up and showcase your work history and experience
-            </p>
-          </div>
-
-          <div className="text-center">
-            <div className="w-12 h-12 bg-[var(--color-coffee-accent)] text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
-              2
-            </div>
-            <h4 className="font-bold mb-2 font-heading">Get Reviewed</h4>
-            <p className="text-sm text-[var(--color-coffee-text)]">
-              Receive reviews and badge tags from colleagues and managers
-            </p>
-          </div>
-
-          <div className="text-center">
-            <div className="w-12 h-12 bg-[var(--color-coffee-accent)] text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
-              3
-            </div>
-            <h4 className="font-bold mb-2 font-heading">Earn Badges</h4>
-            <p className="text-sm text-[var(--color-coffee-text)]">
-              Unlock badges as you accumulate tags in different skills
-            </p>
-          </div>
-
-          <div className="text-center">
-            <div className="w-12 h-12 bg-[var(--color-coffee-accent)] text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
-              4
-            </div>
-            <h4 className="font-bold mb-2 font-heading">Get Hired</h4>
-            <p className="text-sm text-[var(--color-coffee-text)]">
-              Connect with cafés seeking baristas with your expertise
-            </p>
-          </div>
+      {/* How it works — editorial numbered list */}
+      <section>
+        <div className="flex items-end justify-between mb-12">
+          <h2 className="font-heading text-3xl">How it works</h2>
+          <span className="eyebrow hidden sm:inline">Four steps</span>
         </div>
+
+        <ol className="grid md:grid-cols-4 gap-x-8 gap-y-10">
+          {[
+            { n: 'I', t: 'Set the page', b: 'Sign in and lay out your stations, history, and the way you take coffee seriously.' },
+            { n: 'II', t: 'Be seen', b: 'Colleagues and managers leave reviews — weighted by who they are.' },
+            { n: 'III', t: 'Earn marks', b: 'Patterns in your reviews surface as quiet, specific badges over time.' },
+            { n: 'IV', t: 'Find a room', b: 'Cafés discover you when your craft matches what their bar needs.' },
+          ].map((s) => (
+            <li key={s.n} className="border-t hairline pt-5">
+              <div
+                className="font-heading text-[var(--color-accent)] text-2xl mb-3 italic"
+                style={{ fontVariationSettings: '"opsz" 144' }}
+              >
+                {s.n}
+              </div>
+              <h4 className="font-heading text-lg mb-2">{s.t}</h4>
+              <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">{s.b}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      {/* Closing line */}
+      <section className="glass-strong rounded-[14px] px-10 py-14 text-center">
+        <p
+          className="font-heading italic text-3xl md:text-4xl max-w-3xl mx-auto leading-tight"
+          style={{ fontVariationSettings: '"opsz" 144' }}
+        >
+          &ldquo;A good barista is remembered. We just gave the memory a place to live.&rdquo;
+        </p>
+        <p className="eyebrow mt-6">Beyond the Bar · No. 001</p>
       </section>
     </div>
   );
