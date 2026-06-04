@@ -45,17 +45,11 @@ export const EditBasicInfo = ({ userId, initialData, onSave, onCancel }: EditBas
     try {
       setLoading(true);
       setError('');
-
       await updateUserProfile(userId, {
         bio: data.bio,
         coffeePhilosophy: data.coffeePhilosophy || '',
-        location: {
-          city: data.city,
-          state: data.state,
-          country: data.country
-        }
+        location: { city: data.city, state: data.state, country: data.country }
       });
-
       onSave();
     } catch (err: any) {
       setError(err.message || 'Failed to update profile');
@@ -65,99 +59,57 @@ export const EditBasicInfo = ({ userId, initialData, onSave, onCancel }: EditBas
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          {error}
-        </div>
-      )}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {error && <div className="alert-error">{error}</div>}
 
       <div>
-        <label htmlFor="bio" className="block text-sm font-medium mb-1">
-          Bio <span className="text-red-500">*</span>
-        </label>
-        <textarea
-          {...register('bio')}
-          id="bio"
-          rows={4}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-coffee-accent)] focus:border-transparent"
-        />
-        <p className="text-sm text-gray-500 mt-1">{watch('bio')?.length || 0}/500 characters</p>
-        {errors.bio && <p className="text-red-500 text-sm mt-1">{errors.bio.message}</p>}
+        <label htmlFor="bio" className="label">Bio</label>
+        <textarea {...register('bio')} id="bio" rows={4} className="textarea" />
+        <div className="flex justify-between mt-1.5 text-xs text-[var(--color-ink-soft)]">
+          <span>{errors.bio?.message ?? 'Minimum 20 characters.'}</span>
+          <span>{watch('bio')?.length || 0} / 500</span>
+        </div>
       </div>
 
       <div>
-        <label htmlFor="coffeePhilosophy" className="block text-sm font-medium mb-1">
-          Coffee Philosophy
-        </label>
+        <label htmlFor="coffeePhilosophy" className="label">Philosophy</label>
         <textarea
           {...register('coffeePhilosophy')}
           id="coffeePhilosophy"
           rows={3}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-coffee-accent)] focus:border-transparent"
-          placeholder="What's your approach to coffee?"
+          className="textarea"
+          placeholder="One line. What do you believe a cup should be?"
         />
-        <p className="text-sm text-gray-500 mt-1">{watch('coffeePhilosophy')?.length || 0}/300 characters</p>
-        {errors.coffeePhilosophy && (
-          <p className="text-red-500 text-sm mt-1">{errors.coffeePhilosophy.message}</p>
-        )}
+        <div className="flex justify-between mt-1.5 text-xs text-[var(--color-ink-soft)]">
+          <span>{errors.coffeePhilosophy?.message ?? ''}</span>
+          <span>{watch('coffeePhilosophy')?.length || 0} / 300</span>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label htmlFor="city" className="block text-sm font-medium mb-1">
-            City <span className="text-red-500">*</span>
-          </label>
-          <input
-            {...register('city')}
-            type="text"
-            id="city"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-coffee-accent)] focus:border-transparent"
-          />
-          {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city.message}</p>}
+          <label htmlFor="city" className="label">City</label>
+          <input {...register('city')} type="text" id="city" className="input" />
+          {errors.city && <p className="field-error">{errors.city.message}</p>}
         </div>
-
         <div>
-          <label htmlFor="state" className="block text-sm font-medium mb-1">
-            State <span className="text-red-500">*</span>
-          </label>
-          <input
-            {...register('state')}
-            type="text"
-            id="state"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-coffee-accent)] focus:border-transparent"
-          />
-          {errors.state && <p className="text-red-500 text-sm mt-1">{errors.state.message}</p>}
+          <label htmlFor="state" className="label">State</label>
+          <input {...register('state')} type="text" id="state" className="input" />
+          {errors.state && <p className="field-error">{errors.state.message}</p>}
         </div>
-
         <div>
-          <label htmlFor="country" className="block text-sm font-medium mb-1">
-            Country <span className="text-red-500">*</span>
-          </label>
-          <input
-            {...register('country')}
-            type="text"
-            id="country"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-coffee-accent)] focus:border-transparent"
-          />
-          {errors.country && <p className="text-red-500 text-sm mt-1">{errors.country.message}</p>}
+          <label htmlFor="country" className="label">Country</label>
+          <input {...register('country')} type="text" id="country" className="input" />
+          {errors.country && <p className="field-error">{errors.country.message}</p>}
         </div>
       </div>
 
-      <div className="flex gap-4 pt-4">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
-        >
+      <div className="flex gap-3 pt-2">
+        <button type="button" onClick={onCancel} className="btn-ghost flex-1">
           Cancel
         </button>
-        <button
-          type="submit"
-          disabled={loading}
-          className="flex-1 bg-[var(--color-coffee-accent)] text-[var(--color-coffee-text)] px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
-        >
-          {loading ? 'Saving...' : 'Save Changes'}
+        <button type="submit" disabled={loading} className="btn-primary flex-[2] disabled:opacity-50">
+          {loading ? 'Saving…' : 'Save changes'}
         </button>
       </div>
     </form>

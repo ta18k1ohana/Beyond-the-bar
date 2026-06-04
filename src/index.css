@@ -5,21 +5,21 @@
  * Neutral by design so it sits comfortably alongside any café's own brand.
  */
 @theme {
-  /* Neutral surface palette */
-  --color-paper: #F5F1EA;        /* warm off-white, primary background */
-  --color-paper-2: #ECE6DB;      /* slightly deeper card tone */
-  --color-ink: #1A1815;          /* near-black for type */
-  --color-ink-soft: #4A4641;     /* secondary text */
-  --color-hairline: #D9D2C5;     /* 1px dividers / borders */
+  /* Neutral surface palette — near-white, the faintest warmth */
+  --color-paper: #FAFAF7;        /* near-white background */
+  --color-paper-2: #F2F1EC;      /* slightly deeper card tone for nesting */
+  --color-ink: #15140F;          /* near-black for type */
+  --color-ink-soft: #5B5751;     /* secondary text */
+  --color-hairline: #E6E3DC;     /* 1px dividers / borders */
 
   /* Single muted accent — faded oxblood. Restrained, vintage. */
   --color-accent: #7A2E2A;
   --color-accent-soft: #B5746F;
 
-  /* Glass surfaces */
-  --glass-bg: rgba(255, 252, 246, 0.55);
-  --glass-bg-strong: rgba(255, 252, 246, 0.75);
-  --glass-border: rgba(26, 24, 21, 0.08);
+  /* Glass surfaces — tuned for a near-white base */
+  --glass-bg: rgba(255, 255, 253, 0.6);
+  --glass-bg-strong: rgba(255, 255, 253, 0.8);
+  --glass-border: rgba(21, 20, 15, 0.08);
 
   /* Legacy coffee tokens kept as aliases so existing components don't break.
      They'll get cleaned up as each surface is migrated. */
@@ -64,13 +64,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
   letter-spacing: -0.005em;
   min-height: 100vh;
-
-  /* Faint paper grain — pure CSS, no asset. */
-  background-image:
-    radial-gradient(rgba(26, 24, 21, 0.035) 1px, transparent 1px),
-    radial-gradient(rgba(26, 24, 21, 0.025) 1px, transparent 1px);
-  background-size: 3px 3px, 7px 7px;
-  background-position: 0 0, 1px 2px;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -141,26 +134,25 @@ h1, h2, h3, h4, h5, h6 {
 .textarea,
 .select {
   width: 100%;
-  background: rgba(255, 252, 246, 0.6);
+  background: #FFFFFF;
   border: 1px solid var(--color-hairline);
   border-radius: 10px;
-  padding: 0.7rem 0.9rem;
+  padding: 0.75rem 0.95rem;
   font-family: var(--font-body);
   font-size: 0.95rem;
   color: var(--color-ink);
-  transition: border-color 120ms ease, background 120ms ease, box-shadow 120ms ease;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
 }
 .input::placeholder,
 .textarea::placeholder {
-  color: rgba(74, 70, 65, 0.55);
+  color: rgba(91, 87, 81, 0.55);
 }
 .input:focus,
 .textarea:focus,
 .select:focus {
   outline: none;
   border-color: var(--color-ink);
-  background: rgba(255, 252, 246, 0.9);
-  box-shadow: 0 0 0 3px rgba(26, 24, 21, 0.06);
+  box-shadow: 0 0 0 3px rgba(21, 20, 15, 0.05);
 }
 
 .label {
@@ -188,13 +180,21 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 0.9rem;
 }
 
-/* Card surfaces */
+/* Card surfaces — clean white over the near-white base */
 .card {
-  background: var(--glass-bg-strong);
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  background: #FFFFFF;
   border: 1px solid var(--color-hairline);
   border-radius: 14px;
+  box-shadow:
+    0 1px 2px rgba(21, 20, 15, 0.02),
+    0 6px 24px -12px rgba(21, 20, 15, 0.06);
+}
+
+/* Inset / nested surface when you need to layer inside a .card */
+.card-inset {
+  background: var(--color-paper-2);
+  border: 1px solid var(--color-hairline);
+  border-radius: 10px;
 }
 
 /* Badge color helpers (kept for existing components) */

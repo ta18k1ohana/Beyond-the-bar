@@ -5,88 +5,64 @@ interface ProfileCompletionProps {
   user: User;
 }
 
+const getMissingItems = (user: User): string[] => {
+  const missing: string[] = [];
+  if (!user.location.city || !user.location.state) missing.push('Location');
+  if (!user.bio || user.bio.length < 20) missing.push('A short bio');
+  if (!user.coffeePhilosophy || user.coffeePhilosophy.length < 10) missing.push('A line of philosophy');
+  if (!user.profilePhoto) missing.push('A portrait');
+  if (!user.currentWorkplace) missing.push('Current café');
+  if (user.workHistory.length === 0) missing.push('Past bars');
+  if (user.certifications.length === 0) missing.push('Certifications');
+  if (user.portfolio.length === 0) missing.push('A few photographs');
+  return missing;
+};
+
 export const ProfileCompletion = ({ user }: ProfileCompletionProps) => {
-  const completionPercent = calculateProfileCompletion(user);
-
-  const getCompletionColor = (percent: number) => {
-    if (percent >= 80) return 'bg-green-500';
-    if (percent >= 50) return 'bg-yellow-500';
-    return 'bg-red-500';
-  };
-
-  const getMissingItems = (user: User): string[] => {
-    const missing: string[] = [];
-
-    if (!user.location.city || !user.location.state) {
-      missing.push('Location');
-    }
-    if (!user.bio || user.bio.length < 20) {
-      missing.push('Bio (at least 20 characters)');
-    }
-    if (!user.coffeePhilosophy || user.coffeePhilosophy.length < 10) {
-      missing.push('Coffee philosophy');
-    }
-    if (!user.profilePhoto) {
-      missing.push('Profile photo');
-    }
-    if (!user.currentWorkplace) {
-      missing.push('Current workplace');
-    }
-    if (user.workHistory.length === 0) {
-      missing.push('Work history');
-    }
-    if (user.certifications.length === 0) {
-      missing.push('Certifications');
-    }
-    if (user.portfolio.length === 0) {
-      missing.push('Portfolio images');
-    }
-
-    return missing;
-  };
-
-  const missingItems = getMissingItems(user);
+  const percent = calculateProfileCompletion(user);
+  const missing = getMissingItems(user);
+  const complete = percent === 100;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-bold text-[var(--color-coffee-primary)] font-heading">
-          Profile Completion
-        </h3>
-        <span className="text-2xl font-bold text-[var(--color-coffee-primary)]">
-          {completionPercent}%
+    <div className="card p-6">
+      <div className="flex items-baseline justify-between mb-4">
+        <p className="eyebrow">Completion</p>
+        <span
+          className="font-heading text-3xl leading-none"
+          style={{ fontVariationSettings: '"opsz" 144' }}
+        >
+          {percent}
+          <span className="text-base text-[var(--color-ink-soft)]">%</span>
         </span>
       </div>
 
-      {/* Progress Bar */}
-      <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
+      {/* Progress bar — single-accent, no traffic-light colors */}
+      <div className="relative h-[3px] bg-[var(--color-hairline)] rounded-full overflow-hidden mb-5">
         <div
-          className={`h-3 rounded-full transition-all duration-300 ${getCompletionColor(completionPercent)}`}
-          style={{ width: `${completionPercent}%` }}
+          className="absolute inset-y-0 left-0 bg-[var(--color-ink)] transition-all duration-500"
+          style={{ width: `${percent}%` }}
         />
       </div>
 
-      {completionPercent < 100 && (
-        <div>
-          <p className="text-sm text-gray-600 mb-2">To complete your profile, add:</p>
-          <ul className="space-y-1">
-            {missingItems.map((item, index) => (
-              <li key={index} className="text-sm text-gray-700 flex items-center gap-2">
-                <span className="text-[var(--color-coffee-accent)]">•</span>
+      {!complete ? (
+        <>
+          <p className="text-xs text-[var(--color-ink-soft)] mb-3">Still to add</p>
+          <ul className="space-y-1.5">
+            {missing.map((item) => (
+              <li
+                key={item}
+                className="text-sm text-[var(--color-ink)] flex items-center gap-2.5"
+              >
+                <span className="w-1 h-1 rounded-full bg-[var(--color-accent)]" />
                 {item}
               </li>
             ))}
           </ul>
-        </div>
-      )}
-
-      {completionPercent === 100 && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-          <p className="text-green-800 text-sm font-semibold flex items-center gap-2">
-            <span className="text-xl">🎉</span>
-            Your profile is complete! You're ready to start earning badges.
-          </p>
-        </div>
+        </>
+      ) : (
+        <p className="text-sm text-[var(--color-ink)] leading-relaxed">
+          The page is set. Now you wait for the first review.
+        </p>
       )}
     </div>
   );
