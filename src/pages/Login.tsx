@@ -39,67 +39,57 @@ export const Login = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto">
-      <div className="bg-white rounded-lg shadow-md p-8">
-        <h1 className="text-3xl font-bold text-center mb-6 text-[var(--color-coffee-primary)] font-heading">
-          Welcome Back
+    <div className="max-w-md mx-auto pt-8">
+      <div className="card p-10">
+        <p className="eyebrow mb-3">Return</p>
+        <h1
+          className="font-heading text-4xl mb-8 leading-none"
+          style={{ fontVariationSettings: '"opsz" 144' }}
+        >
+          Welcome back.
         </h1>
 
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
-        )}
+        {error && <div className="alert-error mb-5">{error}</div>}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-1">
-              Email
-            </label>
+            <label htmlFor="email" className="label">Email</label>
             <input
               {...register('email')}
               type="email"
               id="email"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-coffee-accent)] focus:border-transparent"
-              placeholder="your@email.com"
+              className="input"
+              placeholder="you@cafe.com"
             />
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-            )}
+            {errors.email && <p className="field-error">{errors.email.message}</p>}
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium mb-1">
-              Password
-            </label>
+            <label htmlFor="password" className="label">Password</label>
             <input
               {...register('password')}
               type="password"
               id="password"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-coffee-accent)] focus:border-transparent"
+              className="input"
               placeholder="••••••••"
             />
-            {errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
-            )}
+            {errors.password && <p className="field-error">{errors.password.message}</p>}
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[var(--color-coffee-accent)] text-[var(--color-coffee-text)] py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+            className="btn-primary w-full mt-2 disabled:opacity-50"
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'Signing in…' : 'Sign in'}
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm">
-          <p className="text-gray-600">
-            Don't have an account?{' '}
-            <Link to="/signup" className="text-[var(--color-coffee-primary)] font-semibold hover:underline">
-              Sign up
-            </Link>
-          </p>
+        <div className="mt-8 pt-6 border-t hairline text-center text-sm text-[var(--color-ink-soft)]">
+          New here?{' '}
+          <Link to="/signup" className="text-[var(--color-ink)] underline underline-offset-4 decoration-[var(--color-accent)]">
+            Begin a profile
+          </Link>
         </div>
       </div>
     </div>

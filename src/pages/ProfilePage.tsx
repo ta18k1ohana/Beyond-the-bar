@@ -10,6 +10,13 @@ import { ProfilePhotoUpload } from '../components/profile/ProfilePhotoUpload';
 import { ReviewList } from '../components/reviews/ReviewList';
 import { getPendingVerifications } from '../services/review.service';
 
+const levelTone: Record<string, string> = {
+  gold: 'text-[var(--color-badge-gold)]',
+  silver: 'text-[var(--color-badge-silver)]',
+  bronze: 'text-[var(--color-badge-bronze)]',
+  legendary: 'text-[var(--color-badge-legendary)]',
+};
+
 export const ProfilePage = () => {
   const { user } = useAuth();
   const { userProfile, fetchUserProfile, loading } = useUserStore();
@@ -41,264 +48,242 @@ export const ProfilePage = () => {
   };
 
   const handlePhotoUpdate = (_newPhotoURL: string) => {
-    // Refresh profile to show new photo
-    if (user) {
-      fetchUserProfile(user.uid);
-    }
+    if (user) fetchUserProfile(user.uid);
   };
 
   if (!user) {
     return (
-      <div className="text-center py-12">
-        <p>Please sign in to view your profile.</p>
+      <div className="text-center py-16 text-[var(--color-ink-soft)]">
+        Please sign in to view your profile.
       </div>
     );
   }
 
   if (loading || !userProfile) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-xl text-gray-600">Loading profile...</div>
+      <div className="flex items-center justify-center py-20 text-[var(--color-ink-soft)]">
+        Loading profile…
       </div>
     );
   }
 
+  const Stat = ({ value, label }: { value: React.ReactNode; label: string }) => (
+    <div className="border-t hairline pt-3 min-w-[5rem]">
+      <div
+        className="font-heading text-2xl"
+        style={{ fontVariationSettings: '"opsz" 144' }}
+      >
+        {value}
+      </div>
+      <div className="eyebrow mt-1">{label}</div>
+    </div>
+  );
+
   return (
     <div className="max-w-5xl mx-auto">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Profile Overview */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Header Card */}
-          <div className="bg-white rounded-lg shadow-md p-8">
-            {/* Profile Photo Upload */}
-            <div className="mb-6">
-              <ProfilePhotoUpload
-                userId={user.uid}
-                currentPhotoURL={userProfile.profilePhoto}
-                onPhotoUpdate={handlePhotoUpdate}
-              />
-            </div>
+      {/* Masthead */}
+      <header className="mb-10 pb-10 border-b hairline">
+        <div className="flex items-start gap-8 flex-wrap">
+          <div className="shrink-0">
+            <ProfilePhotoUpload
+              userId={user.uid}
+              currentPhotoURL={userProfile.profilePhoto}
+              onPhotoUpdate={handlePhotoUpdate}
+            />
+          </div>
 
-            <div className="flex items-start gap-6">
-              {/* Basic Info */}
-              <div className="flex-1">
-                <h1 className="text-3xl font-bold text-[var(--color-coffee-primary)] font-heading">
-                  {userProfile.name}
-                </h1>
-                {userProfile.currentWorkplace && (
-                  <p className="text-lg text-gray-700 mt-1">
-                    {userProfile.currentWorkplace.position} at {userProfile.currentWorkplace.cafeName}
-                  </p>
-                )}
-                <p className="text-gray-600 mt-1">
-                  📍 {userProfile.location.city}, {userProfile.location.state}
+          <div className="flex-1 min-w-[260px]">
+            <p className="eyebrow mb-2">Profile · No. 001</p>
+            <h1
+              className="font-heading text-5xl leading-none"
+              style={{ fontVariationSettings: '"opsz" 144' }}
+            >
+              {userProfile.name}
+            </h1>
+
+            {userProfile.currentWorkplace && (
+              <p className="font-heading italic text-lg text-[var(--color-ink-soft)] mt-3">
+                {userProfile.currentWorkplace.position} · {userProfile.currentWorkplace.cafeName}
+              </p>
+            )}
+            <p className="text-sm text-[var(--color-ink-soft)] mt-1">
+              {userProfile.location.city}, {userProfile.location.state}
+            </p>
+
+            <div className="flex gap-8 mt-6">
+              <Stat value={userProfile.badges.length} label="Marks" />
+              <Stat value={userProfile.reviewCount} label="Reviews" />
+              {userProfile.privacySettings.showAverageRating && userProfile.averageRating > 0 && (
+                <Stat value={userProfile.averageRating.toFixed(1)} label="Rating" />
+              )}
+            </div>
+          </div>
+
+          <button
+            onClick={() => setEditingBasicInfo(!editingBasicInfo)}
+            className="btn-ghost text-sm"
+          >
+            {editingBasicInfo ? 'Cancel' : 'Edit'}
+          </button>
+        </div>
+
+        {/* Bio + Philosophy */}
+        {!editingBasicInfo ? (
+          <div className="mt-10 grid md:grid-cols-2 gap-10">
+            {userProfile.bio && (
+              <div>
+                <p className="eyebrow mb-3">About</p>
+                <p className="text-[var(--color-ink)] leading-relaxed">{userProfile.bio}</p>
+              </div>
+            )}
+            {userProfile.coffeePhilosophy && (
+              <div>
+                <p className="eyebrow mb-3">Philosophy</p>
+                <p
+                  className="font-heading italic text-xl leading-snug text-[var(--color-ink)]"
+                  style={{ fontVariationSettings: '"opsz" 144' }}
+                >
+                  &ldquo;{userProfile.coffeePhilosophy}&rdquo;
                 </p>
-
-                {/* Stats */}
-                <div className="flex gap-6 mt-4">
-                  <div>
-                    <span className="font-bold text-[var(--color-coffee-primary)]">
-                      {userProfile.badges.length}
-                    </span>
-                    <span className="text-gray-600 text-sm ml-1">Badges</span>
-                  </div>
-                  <div>
-                    <span className="font-bold text-[var(--color-coffee-primary)]">
-                      {userProfile.reviewCount}
-                    </span>
-                    <span className="text-gray-600 text-sm ml-1">Reviews</span>
-                  </div>
-                  {userProfile.privacySettings.showAverageRating && userProfile.averageRating > 0 && (
-                    <div>
-                      <span className="font-bold text-[var(--color-coffee-primary)]">
-                        {userProfile.averageRating.toFixed(1)} ⭐
-                      </span>
-                      <span className="text-gray-600 text-sm ml-1">Rating</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Edit Button */}
-              <button
-                onClick={() => setEditingBasicInfo(!editingBasicInfo)}
-                className="text-[var(--color-coffee-accent)] hover:underline font-semibold"
-              >
-                {editingBasicInfo ? 'Cancel' : 'Edit'}
-              </button>
-            </div>
-
-            {/* Bio & Philosophy */}
-            {!editingBasicInfo ? (
-              <div className="mt-6 space-y-4">
-                {userProfile.bio && (
-                  <div>
-                    <h3 className="font-bold text-[var(--color-coffee-text)] mb-2">About</h3>
-                    <p className="text-gray-700 leading-relaxed">{userProfile.bio}</p>
-                  </div>
-                )}
-
-                {userProfile.coffeePhilosophy && (
-                  <div>
-                    <h3 className="font-bold text-[var(--color-coffee-text)] mb-2">Coffee Philosophy</h3>
-                    <p className="text-gray-700 italic leading-relaxed">"{userProfile.coffeePhilosophy}"</p>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="mt-6">
-                <EditBasicInfo
-                  userId={user.uid}
-                  initialData={{
-                    bio: userProfile.bio || '',
-                    coffeePhilosophy: userProfile.coffeePhilosophy || '',
-                    location: userProfile.location
-                  }}
-                  onSave={() => {
-                    setEditingBasicInfo(false);
-                    handleRefresh();
-                  }}
-                  onCancel={() => setEditingBasicInfo(false)}
-                />
               </div>
             )}
           </div>
+        ) : (
+          <div className="mt-8">
+            <EditBasicInfo
+              userId={user.uid}
+              initialData={{
+                bio: userProfile.bio || '',
+                coffeePhilosophy: userProfile.coffeePhilosophy || '',
+                location: userProfile.location
+              }}
+              onSave={() => {
+                setEditingBasicInfo(false);
+                handleRefresh();
+              }}
+              onCancel={() => setEditingBasicInfo(false)}
+            />
+          </div>
+        )}
+      </header>
 
-          {/* Badges Section */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-[var(--color-coffee-primary)] font-heading">
-                Your Badges
-              </h2>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        {/* Main column */}
+        <div className="lg:col-span-2 space-y-14">
+          {/* Marks of craft */}
+          <section>
+            <div className="flex items-end justify-between mb-6">
+              <div>
+                <p className="eyebrow mb-1">Section I</p>
+                <h2 className="font-heading text-2xl">Marks of craft</h2>
+              </div>
               {userProfile.badges.length > 0 && (
                 <Link
                   to="/badges"
-                  className="text-[var(--color-coffee-accent)] hover:underline text-sm font-semibold"
+                  className="text-sm text-[var(--color-ink-soft)] hover:text-[var(--color-ink)] underline underline-offset-4 decoration-[var(--color-accent)]"
                 >
-                  View All Badges →
+                  All marks
                 </Link>
               )}
             </div>
 
             {userProfile.badges.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {userProfile.badges.slice(0, 6).map((badge) => (
-                  <div
-                    key={badge.badgeId}
-                    className={`p-4 rounded-lg border-2 text-center ${
-                      badge.level === 'gold'
-                        ? 'border-yellow-400 bg-yellow-50'
-                        : badge.level === 'silver'
-                        ? 'border-gray-400 bg-gray-50'
-                        : badge.level === 'bronze'
-                        ? 'border-orange-400 bg-orange-50'
-                        : 'border-purple-400 bg-purple-50'
-                    }`}
-                  >
-                    <div className="text-2xl mb-1">🏆</div>
-                    <div className="text-xs font-semibold text-gray-700">{badge.badgeId}</div>
-                    <div className="text-xs text-gray-600 capitalize mt-1">{badge.level}</div>
+                  <div key={badge.badgeId} className="card p-5">
+                    <p className={`eyebrow ${levelTone[badge.level] ?? ''}`}>{badge.level}</p>
+                    <p className="font-heading text-base mt-1.5">{badge.badgeId}</p>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8">
-                <p className="text-gray-600 mb-4">
-                  You haven't earned any badges yet. Start by asking colleagues for reviews!
+              <div className="card p-8 text-center">
+                <p className="text-[var(--color-ink-soft)] mb-5">
+                  No marks yet. Ask a colleague for a review.
                 </p>
-                <Link
-                  to="/badges"
-                  className="inline-block bg-[var(--color-coffee-accent)] text-[var(--color-coffee-text)] px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity"
-                >
-                  Explore Badges
-                </Link>
+                <Link to="/badges" className="btn-ghost text-sm">Browse the catalogue</Link>
               </div>
             )}
-          </div>
+          </section>
 
-          {/* Work History */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <WorkHistoryManager
-              userId={user.uid}
-              workHistory={userProfile.workHistory}
-              currentWorkplace={userProfile.currentWorkplace}
-              onUpdate={handleRefresh}
-            />
-          </div>
+          {/* Work history */}
+          <section>
+            <p className="eyebrow mb-1">Section II</p>
+            <h2 className="font-heading text-2xl mb-6">Where you&rsquo;ve poured</h2>
+            <div className="card p-6">
+              <WorkHistoryManager
+                userId={user.uid}
+                workHistory={userProfile.workHistory}
+                currentWorkplace={userProfile.currentWorkplace}
+                onUpdate={handleRefresh}
+              />
+            </div>
+          </section>
 
           {/* Certifications */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <CertificationManager
-              userId={user.uid}
-              certifications={userProfile.certifications}
-              onUpdate={handleRefresh}
-            />
-          </div>
+          <section>
+            <p className="eyebrow mb-1">Section III</p>
+            <h2 className="font-heading text-2xl mb-6">Training & papers</h2>
+            <div className="card p-6">
+              <CertificationManager
+                userId={user.uid}
+                certifications={userProfile.certifications}
+                onUpdate={handleRefresh}
+              />
+            </div>
+          </section>
 
           {/* Reviews */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-[var(--color-coffee-primary)] font-heading">
-                Reviews
-              </h2>
+          <section>
+            <div className="flex items-end justify-between mb-6">
+              <div>
+                <p className="eyebrow mb-1">Section IV</p>
+                <h2 className="font-heading text-2xl">Words from peers</h2>
+              </div>
               <Link
                 to="/give-review"
-                className="text-[var(--color-coffee-accent)] hover:underline text-sm font-semibold"
+                className="text-sm text-[var(--color-ink-soft)] hover:text-[var(--color-ink)] underline underline-offset-4 decoration-[var(--color-accent)]"
               >
-                + Add Review for Someone
+                Write one
               </Link>
             </div>
-            <ReviewList userId={user.uid} isOwner={true} limit={5} />
-          </div>
+            <div className="card p-6">
+              <ReviewList userId={user.uid} isOwner={true} limit={5} />
+            </div>
+          </section>
         </div>
 
-        {/* Right Column - Sidebar */}
-        <div className="space-y-6">
-          {/* Profile Completion */}
+        {/* Sidebar */}
+        <aside className="space-y-6">
           <ProfileCompletion user={userProfile} />
 
-          {/* Quick Actions */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h3 className="text-lg font-bold text-[var(--color-coffee-primary)] font-heading mb-4">
-              Quick Actions
-            </h3>
-            <div className="space-y-3">
-              <Link
-                to="/give-review"
-                className="block w-full bg-[var(--color-coffee-primary)] text-white text-center px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity"
-              >
-                Give a Review
+          <div className="card p-6">
+            <p className="eyebrow mb-4">Do</p>
+            <div className="space-y-2.5">
+              <Link to="/give-review" className="btn-primary w-full block text-center">
+                Give a review
               </Link>
               {pendingVerificationCount > 0 && (
-                <Link
-                  to="/verify-reviews"
-                  className="block w-full bg-[var(--color-coffee-accent)] text-[var(--color-coffee-text)] text-center px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity relative"
-                >
-                  Verify Reviews
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                <Link to="/verify-reviews" className="btn-ghost w-full block text-center relative">
+                  Verify reviews
+                  <span className="absolute -top-2 -right-2 bg-[var(--color-accent)] text-[var(--color-paper)] text-[10px] tracking-wider px-1.5 py-0.5 rounded-full">
                     {pendingVerificationCount}
                   </span>
                 </Link>
               )}
-              <Link
-                to="/settings"
-                className="block w-full bg-gray-200 text-gray-700 text-center px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
-              >
-                Privacy Settings
+              <Link to="/settings" className="btn-ghost w-full block text-center">
+                Privacy
               </Link>
             </div>
           </div>
 
-          {/* Profile Views (Future) */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h3 className="text-lg font-bold text-[var(--color-coffee-primary)] font-heading mb-2">
-              Profile Insights
-            </h3>
-            <p className="text-gray-600 text-sm">
-              Coming soon: See who's viewed your profile and track your visibility in the community.
+          <div className="card p-6">
+            <p className="eyebrow mb-3">Coming</p>
+            <p className="text-sm text-[var(--color-ink-soft)] leading-relaxed">
+              A quiet record of who&rsquo;s read your page — soon.
             </p>
           </div>
-        </div>
+        </aside>
       </div>
     </div>
   );

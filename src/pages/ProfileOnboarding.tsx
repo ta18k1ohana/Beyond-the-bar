@@ -8,20 +8,17 @@ import { useUserStore } from '../store/userStore';
 import { updateUserProfile, updateCurrentWorkplace } from '../services/user.service';
 import type { Workplace } from '../types';
 
-// Step 1: Location
 const locationSchema = z.object({
   city: z.string().min(2, 'City is required'),
   state: z.string().min(2, 'State is required'),
   country: z.string().min(2, 'Country is required')
 });
 
-// Step 2: Bio
 const bioSchema = z.object({
   bio: z.string().min(20, 'Bio must be at least 20 characters').max(500, 'Bio must be less than 500 characters'),
   coffeePhilosophy: z.string().max(300, 'Coffee philosophy must be less than 300 characters').optional()
 });
 
-// Step 3: Current Workplace
 const workplaceSchema = z.object({
   cafeName: z.string().min(2, 'Café name is required'),
   position: z.string().min(2, 'Position is required'),
@@ -33,6 +30,8 @@ type LocationFormData = z.infer<typeof locationSchema>;
 type BioFormData = z.infer<typeof bioSchema>;
 type WorkplaceFormData = z.infer<typeof workplaceSchema>;
 
+const STEP_LABELS = ['Place', 'Voice', 'Bar'];
+
 export const ProfileOnboarding = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -42,12 +41,9 @@ export const ProfileOnboarding = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (user) {
-      fetchUserProfile(user.uid);
-    }
+    if (user) fetchUserProfile(user.uid);
   }, [user, fetchUserProfile]);
 
-  // Location form
   const locationForm = useForm<LocationFormData>({
     resolver: zodResolver(locationSchema),
     defaultValues: {
@@ -57,7 +53,6 @@ export const ProfileOnboarding = () => {
     }
   });
 
-  // Bio form
   const bioForm = useForm<BioFormData>({
     resolver: zodResolver(bioSchema),
     defaultValues: {
@@ -66,20 +61,13 @@ export const ProfileOnboarding = () => {
     }
   });
 
-  // Workplace form
   const workplaceForm = useForm<WorkplaceFormData>({
     resolver: zodResolver(workplaceSchema),
-    defaultValues: {
-      cafeName: '',
-      position: '',
-      startDate: '',
-      current: true
-    }
+    defaultValues: { cafeName: '', position: '', startDate: '', current: true }
   });
 
   const handleLocationSubmit = async (data: LocationFormData) => {
     if (!user) return;
-
     try {
       setLoading(true);
       setError('');
@@ -94,7 +82,6 @@ export const ProfileOnboarding = () => {
 
   const handleBioSubmit = async (data: BioFormData) => {
     if (!user) return;
-
     try {
       setLoading(true);
       setError('');
@@ -112,19 +99,16 @@ export const ProfileOnboarding = () => {
 
   const handleWorkplaceSubmit = async (data: WorkplaceFormData) => {
     if (!user) return;
-
     try {
       setLoading(true);
       setError('');
-
       const workplace: Workplace = {
-        cafeId: '', // Will be set if café exists in system
+        cafeId: '',
         cafeName: data.cafeName,
         position: data.position,
         startDate: new Date(data.startDate),
         current: data.current
       };
-
       await updateCurrentWorkplace(user.uid, workplace);
       navigate('/profile');
     } catch (err: any) {
@@ -134,287 +118,184 @@ export const ProfileOnboarding = () => {
     }
   };
 
-  const skipWorkplace = () => {
-    navigate('/profile');
-  };
+  const skipWorkplace = () => navigate('/profile');
 
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="bg-white rounded-lg shadow-md p-8">
-        {/* Progress indicator */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-[var(--color-coffee-text)]">
-              Step {step} of 3
-            </span>
-            <span className="text-sm text-gray-500">{Math.round((step / 3) * 100)}% Complete</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div
-              className="bg-[var(--color-coffee-accent)] h-2 rounded-full transition-all duration-300"
-              style={{ width: `${(step / 3) * 100}%` }}
-            />
-          </div>
-        </div>
-
-        <h1 className="text-3xl font-bold text-center mb-2 text-[var(--color-coffee-primary)] font-heading">
-          Complete Your Profile
+    <div className="max-w-2xl mx-auto pt-8">
+      <div className="mb-10">
+        <p className="eyebrow mb-3">Begin · No. 001</p>
+        <h1
+          className="font-heading text-4xl md:text-5xl leading-none"
+          style={{ fontVariationSettings: '"opsz" 144' }}
+        >
+          Lay out the page.
         </h1>
-        <p className="text-center text-gray-600 mb-8">
-          Let's set up your profile so the coffee community can find you!
+        <p className="text-[var(--color-ink-soft)] mt-3 max-w-md">
+          Three short questions. You can revise anything later.
         </p>
+      </div>
 
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-            {error}
-          </div>
-        )}
+      {/* Step indicator */}
+      <div className="grid grid-cols-3 gap-3 mb-10">
+        {STEP_LABELS.map((label, idx) => {
+          const n = idx + 1;
+          const active = step === n;
+          const done = step > n;
+          return (
+            <div key={label} className="border-t hairline pt-3">
+              <div className="flex items-baseline gap-2">
+                <span
+                  className={[
+                    'font-heading italic text-lg',
+                    active || done ? 'text-[var(--color-accent)]' : 'text-[var(--color-ink-soft)]',
+                  ].join(' ')}
+                  style={{ fontVariationSettings: '"opsz" 144' }}
+                >
+                  {['I', 'II', 'III'][idx]}
+                </span>
+                <span className={active ? 'text-[var(--color-ink)]' : 'text-[var(--color-ink-soft)]'}>
+                  {label}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
-        {/* Step 1: Location */}
+      <div className="card p-10">
+        {error && <div className="alert-error mb-6">{error}</div>}
+
+        {/* Step 1 */}
         {step === 1 && (
           <form onSubmit={locationForm.handleSubmit(handleLocationSubmit)} className="space-y-6">
             <div>
-              <h2 className="text-xl font-bold mb-4 text-[var(--color-coffee-primary)] font-heading">
-                Where are you located?
-              </h2>
-              <p className="text-sm text-gray-600 mb-4">
-                This helps cafés and other baristas in your area find you.
+              <h2 className="font-heading text-2xl mb-1">Where do you pour?</h2>
+              <p className="text-sm text-[var(--color-ink-soft)]">
+                So cafés and peers nearby can find you.
               </p>
+            </div>
 
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="city" className="block text-sm font-medium mb-1">
-                    City <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    {...locationForm.register('city')}
-                    type="text"
-                    id="city"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-coffee-accent)] focus:border-transparent"
-                    placeholder="San Francisco"
-                  />
-                  {locationForm.formState.errors.city && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {locationForm.formState.errors.city.message}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="state" className="block text-sm font-medium mb-1">
-                    State <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    {...locationForm.register('state')}
-                    type="text"
-                    id="state"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-coffee-accent)] focus:border-transparent"
-                    placeholder="California"
-                  />
-                  {locationForm.formState.errors.state && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {locationForm.formState.errors.state.message}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="country" className="block text-sm font-medium mb-1">
-                    Country <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    {...locationForm.register('country')}
-                    type="text"
-                    id="country"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-coffee-accent)] focus:border-transparent"
-                    placeholder="USA"
-                  />
-                  {locationForm.formState.errors.country && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {locationForm.formState.errors.country.message}
-                    </p>
-                  )}
-                </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="city" className="label">City</label>
+                <input {...locationForm.register('city')} type="text" id="city" className="input" placeholder="Portland" />
+                {locationForm.formState.errors.city && (
+                  <p className="field-error">{locationForm.formState.errors.city.message}</p>
+                )}
+              </div>
+              <div>
+                <label htmlFor="state" className="label">State / Region</label>
+                <input {...locationForm.register('state')} type="text" id="state" className="input" placeholder="Oregon" />
+                {locationForm.formState.errors.state && (
+                  <p className="field-error">{locationForm.formState.errors.state.message}</p>
+                )}
+              </div>
+              <div className="sm:col-span-2">
+                <label htmlFor="country" className="label">Country</label>
+                <input {...locationForm.register('country')} type="text" id="country" className="input" placeholder="USA" />
+                {locationForm.formState.errors.country && (
+                  <p className="field-error">{locationForm.formState.errors.country.message}</p>
+                )}
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-[var(--color-coffee-accent)] text-[var(--color-coffee-text)] py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
-            >
-              {loading ? 'Saving...' : 'Continue'}
+            <button type="submit" disabled={loading} className="btn-primary w-full disabled:opacity-50">
+              {loading ? 'Saving…' : 'Continue'}
             </button>
           </form>
         )}
 
-        {/* Step 2: Bio */}
+        {/* Step 2 */}
         {step === 2 && (
           <form onSubmit={bioForm.handleSubmit(handleBioSubmit)} className="space-y-6">
             <div>
-              <h2 className="text-xl font-bold mb-4 text-[var(--color-coffee-primary)] font-heading">
-                Tell us about yourself
-              </h2>
-              <p className="text-sm text-gray-600 mb-4">
-                Share your story and what coffee means to you.
+              <h2 className="font-heading text-2xl mb-1">A few lines about you.</h2>
+              <p className="text-sm text-[var(--color-ink-soft)]">
+                Plain words. Specifics over adjectives.
               </p>
+            </div>
 
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="bio" className="block text-sm font-medium mb-1">
-                    Bio <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    {...bioForm.register('bio')}
-                    id="bio"
-                    rows={4}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-coffee-accent)] focus:border-transparent"
-                    placeholder="Share your background, experience, and what makes you passionate about coffee..."
-                  />
-                  <p className="text-sm text-gray-500 mt-1">
-                    {bioForm.watch('bio')?.length || 0}/500 characters (minimum 20)
-                  </p>
-                  {bioForm.formState.errors.bio && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {bioForm.formState.errors.bio.message}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="coffeePhilosophy" className="block text-sm font-medium mb-1">
-                    Coffee Philosophy (Optional)
-                  </label>
-                  <textarea
-                    {...bioForm.register('coffeePhilosophy')}
-                    id="coffeePhilosophy"
-                    rows={3}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-coffee-accent)] focus:border-transparent"
-                    placeholder="What's your approach to coffee? What do you believe in?"
-                  />
-                  <p className="text-sm text-gray-500 mt-1">
-                    {bioForm.watch('coffeePhilosophy')?.length || 0}/300 characters
-                  </p>
-                  {bioForm.formState.errors.coffeePhilosophy && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {bioForm.formState.errors.coffeePhilosophy.message}
-                    </p>
-                  )}
-                </div>
+            <div>
+              <label htmlFor="bio" className="label">Bio</label>
+              <textarea
+                {...bioForm.register('bio')}
+                id="bio"
+                rows={5}
+                className="textarea"
+                placeholder="Five years on bar, mostly natural process Ethiopians. Lead training at two openings."
+              />
+              <div className="flex justify-between mt-1.5 text-xs text-[var(--color-ink-soft)]">
+                <span>{bioForm.formState.errors.bio?.message ?? 'Minimum 20 characters.'}</span>
+                <span>{bioForm.watch('bio')?.length || 0} / 500</span>
               </div>
             </div>
 
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={() => setStep(1)}
-                className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
-              >
-                Back
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 bg-[var(--color-coffee-accent)] text-[var(--color-coffee-text)] py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
-              >
-                {loading ? 'Saving...' : 'Continue'}
+            <div>
+              <label htmlFor="coffeePhilosophy" className="label">Philosophy <span className="normal-case tracking-normal text-[var(--color-ink-soft)] font-normal">(optional)</span></label>
+              <textarea
+                {...bioForm.register('coffeePhilosophy')}
+                id="coffeePhilosophy"
+                rows={3}
+                className="textarea"
+                placeholder="What do you believe a cup should be?"
+              />
+              <div className="flex justify-between mt-1.5 text-xs text-[var(--color-ink-soft)]">
+                <span>{bioForm.formState.errors.coffeePhilosophy?.message ?? ''}</span>
+                <span>{bioForm.watch('coffeePhilosophy')?.length || 0} / 300</span>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button type="button" onClick={() => setStep(1)} className="btn-ghost flex-1">Back</button>
+              <button type="submit" disabled={loading} className="btn-primary flex-[2] disabled:opacity-50">
+                {loading ? 'Saving…' : 'Continue'}
               </button>
             </div>
           </form>
         )}
 
-        {/* Step 3: Current Workplace */}
+        {/* Step 3 */}
         {step === 3 && (
           <form onSubmit={workplaceForm.handleSubmit(handleWorkplaceSubmit)} className="space-y-6">
             <div>
-              <h2 className="text-xl font-bold mb-4 text-[var(--color-coffee-primary)] font-heading">
-                Where do you work?
-              </h2>
-              <p className="text-sm text-gray-600 mb-4">
-                Add your current workplace (you can skip this and add it later).
+              <h2 className="font-heading text-2xl mb-1">The current bar.</h2>
+              <p className="text-sm text-[var(--color-ink-soft)]">
+                Where you stand now. You can skip and add later.
               </p>
+            </div>
 
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="cafeName" className="block text-sm font-medium mb-1">
-                    Café Name
-                  </label>
-                  <input
-                    {...workplaceForm.register('cafeName')}
-                    type="text"
-                    id="cafeName"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-coffee-accent)] focus:border-transparent"
-                    placeholder="Blue Bottle Coffee"
-                  />
-                  {workplaceForm.formState.errors.cafeName && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {workplaceForm.formState.errors.cafeName.message}
-                    </p>
-                  )}
-                </div>
+            <div>
+              <label htmlFor="cafeName" className="label">Café</label>
+              <input {...workplaceForm.register('cafeName')} type="text" id="cafeName" className="input" placeholder="The corner shop" />
+              {workplaceForm.formState.errors.cafeName && (
+                <p className="field-error">{workplaceForm.formState.errors.cafeName.message}</p>
+              )}
+            </div>
 
-                <div>
-                  <label htmlFor="position" className="block text-sm font-medium mb-1">
-                    Position
-                  </label>
-                  <input
-                    {...workplaceForm.register('position')}
-                    type="text"
-                    id="position"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-coffee-accent)] focus:border-transparent"
-                    placeholder="Barista, Lead Barista, Shift Supervisor, etc."
-                  />
-                  {workplaceForm.formState.errors.position && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {workplaceForm.formState.errors.position.message}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="startDate" className="block text-sm font-medium mb-1">
-                    Start Date
-                  </label>
-                  <input
-                    {...workplaceForm.register('startDate')}
-                    type="month"
-                    id="startDate"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-coffee-accent)] focus:border-transparent"
-                  />
-                  {workplaceForm.formState.errors.startDate && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {workplaceForm.formState.errors.startDate.message}
-                    </p>
-                  )}
-                </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="position" className="label">Position</label>
+                <input {...workplaceForm.register('position')} type="text" id="position" className="input" placeholder="Lead barista" />
+                {workplaceForm.formState.errors.position && (
+                  <p className="field-error">{workplaceForm.formState.errors.position.message}</p>
+                )}
+              </div>
+              <div>
+                <label htmlFor="startDate" className="label">Since</label>
+                <input {...workplaceForm.register('startDate')} type="month" id="startDate" className="input" />
+                {workplaceForm.formState.errors.startDate && (
+                  <p className="field-error">{workplaceForm.formState.errors.startDate.message}</p>
+                )}
               </div>
             </div>
 
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={() => setStep(2)}
-                className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
-              >
-                Back
-              </button>
-              <button
-                type="button"
-                onClick={skipWorkplace}
-                className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
-              >
-                Skip for Now
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 bg-[var(--color-coffee-accent)] text-[var(--color-coffee-text)] py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
-              >
-                {loading ? 'Saving...' : 'Complete'}
+            <div className="flex gap-3">
+              <button type="button" onClick={() => setStep(2)} className="btn-ghost flex-1">Back</button>
+              <button type="button" onClick={skipWorkplace} className="btn-ghost flex-1">Skip</button>
+              <button type="submit" disabled={loading} className="btn-primary flex-[2] disabled:opacity-50">
+                {loading ? 'Saving…' : 'Finish'}
               </button>
             </div>
           </form>

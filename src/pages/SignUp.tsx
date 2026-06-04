@@ -26,13 +26,15 @@ export const SignUp = () => {
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors }
   } = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
-    defaultValues: {
-      userType: 'barista'
-    }
+    defaultValues: { userType: 'barista' }
   });
+
+  const userType = watch('userType');
 
   const onSubmit = async (data: SignUpFormData) => {
     try {
@@ -52,127 +54,89 @@ export const SignUp = () => {
     }
   };
 
+  const typeOptions: { value: 'barista' | 'employer'; label: string; sub: string }[] = [
+    { value: 'barista', label: 'Barista', sub: 'I work behind the bar.' },
+    { value: 'employer', label: 'Café', sub: 'I hire and run a team.' },
+  ];
+
   return (
-    <div className="max-w-md mx-auto">
-      <div className="bg-white rounded-lg shadow-md p-8">
-        <h1 className="text-3xl font-bold text-center mb-6 text-[var(--color-coffee-primary)] font-heading">
-          Create Your Profile
+    <div className="max-w-md mx-auto pt-8">
+      <div className="card p-10">
+        <p className="eyebrow mb-3">Begin</p>
+        <h1
+          className="font-heading text-4xl mb-2 leading-none"
+          style={{ fontVariationSettings: '"opsz" 144' }}
+        >
+          A page of your own.
         </h1>
+        <p className="text-sm text-[var(--color-ink-soft)] mb-8">
+          Takes a minute. You can edit anything later.
+        </p>
 
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
-        )}
+        {error && <div className="alert-error mb-5">{error}</div>}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium mb-1">
-              Full Name
-            </label>
-            <input
-              {...register('name')}
-              type="text"
-              id="name"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-coffee-accent)] focus:border-transparent"
-              placeholder="John Doe"
-            />
-            {errors.name && (
-              <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
-            )}
+            <label htmlFor="name" className="label">Full name</label>
+            <input {...register('name')} type="text" id="name" className="input" placeholder="Ada Lovelace" />
+            {errors.name && <p className="field-error">{errors.name.message}</p>}
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-1">
-              Email
-            </label>
-            <input
-              {...register('email')}
-              type="email"
-              id="email"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-coffee-accent)] focus:border-transparent"
-              placeholder="your@email.com"
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-            )}
+            <label htmlFor="email" className="label">Email</label>
+            <input {...register('email')} type="email" id="email" className="input" placeholder="you@cafe.com" />
+            {errors.email && <p className="field-error">{errors.email.message}</p>}
           </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium mb-1">
-              Password
-            </label>
-            <input
-              {...register('password')}
-              type="password"
-              id="password"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-coffee-accent)] focus:border-transparent"
-              placeholder="••••••••"
-            />
-            {errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1">
-              Confirm Password
-            </label>
-            <input
-              {...register('confirmPassword')}
-              type="password"
-              id="confirmPassword"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-coffee-accent)] focus:border-transparent"
-              placeholder="••••••••"
-            />
-            {errors.confirmPassword && (
-              <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">I am a...</label>
-            <div className="space-y-2">
-              <label className="flex items-center">
-                <input
-                  {...register('userType')}
-                  type="radio"
-                  value="barista"
-                  className="mr-2"
-                />
-                <span>Barista</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  {...register('userType')}
-                  type="radio"
-                  value="employer"
-                  className="mr-2"
-                />
-                <span>Café Owner / Manager</span>
-              </label>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label htmlFor="password" className="label">Password</label>
+              <input {...register('password')} type="password" id="password" className="input" placeholder="••••••••" />
+              {errors.password && <p className="field-error">{errors.password.message}</p>}
             </div>
-            {errors.userType && (
-              <p className="text-red-500 text-sm mt-1">{errors.userType.message}</p>
-            )}
+            <div>
+              <label htmlFor="confirmPassword" className="label">Confirm</label>
+              <input {...register('confirmPassword')} type="password" id="confirmPassword" className="input" placeholder="••••••••" />
+              {errors.confirmPassword && <p className="field-error">{errors.confirmPassword.message}</p>}
+            </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[var(--color-coffee-accent)] text-[var(--color-coffee-text)] py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
-          >
-            {loading ? 'Creating account...' : 'Create Account'}
+          <div>
+            <p className="label">I am</p>
+            <div className="grid grid-cols-2 gap-3">
+              {typeOptions.map((opt) => {
+                const selected = userType === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setValue('userType', opt.value, { shouldValidate: true })}
+                    className={[
+                      'text-left rounded-[10px] px-4 py-3 border transition-colors',
+                      selected
+                        ? 'border-[var(--color-ink)] bg-[rgba(26,24,21,0.04)]'
+                        : 'border-[var(--color-hairline)] hover:bg-[rgba(26,24,21,0.02)]',
+                    ].join(' ')}
+                  >
+                    <div className="font-heading text-base">{opt.label}</div>
+                    <div className="text-xs text-[var(--color-ink-soft)] mt-0.5">{opt.sub}</div>
+                  </button>
+                );
+              })}
+            </div>
+            {errors.userType && <p className="field-error">{errors.userType.message}</p>}
+          </div>
+
+          <button type="submit" disabled={loading} className="btn-primary w-full mt-2 disabled:opacity-50">
+            {loading ? 'Creating…' : 'Create account'}
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm">
-          <p className="text-gray-600">
-            Already have an account?{' '}
-            <Link to="/login" className="text-[var(--color-coffee-primary)] font-semibold hover:underline">
-              Sign in
-            </Link>
-          </p>
+        <div className="mt-8 pt-6 border-t hairline text-center text-sm text-[var(--color-ink-soft)]">
+          Already have one?{' '}
+          <Link to="/login" className="text-[var(--color-ink)] underline underline-offset-4 decoration-[var(--color-accent)]">
+            Sign in
+          </Link>
         </div>
       </div>
     </div>
