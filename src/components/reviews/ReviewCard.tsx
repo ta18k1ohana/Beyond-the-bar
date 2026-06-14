@@ -4,140 +4,138 @@ import type { Review } from '../../types';
 interface ReviewCardProps {
   review: Review;
   reviewerName?: string;
-  showFullDetails?: boolean; // For employer view
-  isOwner?: boolean; // If viewing own reviews
+  showFullDetails?: boolean;
+  isOwner?: boolean;
 }
+
+const TIER_LABEL: Record<string, string> = {
+  tier1: 'Colleague',
+  tier2: 'Industry',
+  tier3: 'Customer',
+};
+
+const RELATIONSHIP_LABEL: Record<string, string> = {
+  colleague: 'Colleague',
+  manager: 'Manager',
+  owner: 'Owner',
+  industry_peer: 'Industry peer',
+  customer: 'Customer',
+};
+
+// Five small line-icon stars — restrained, no emoji.
+const Stars = ({ value }: { value: number }) => (
+  <span className="inline-flex items-center gap-0.5" aria-label={`${value} of 5`}>
+    {[0, 1, 2, 3, 4].map((i) => {
+      const filled = i < value;
+      return (
+        <svg
+          key={i}
+          viewBox="0 0 24 24"
+          width="13"
+          height="13"
+          fill={filled ? 'currentColor' : 'none'}
+          stroke="currentColor"
+          strokeWidth="1.25"
+          strokeLinejoin="round"
+          className={filled ? 'text-[var(--color-ink)]' : 'text-[var(--color-hairline)]'}
+          aria-hidden
+        >
+          <path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.8 6.7 19.4l1.2-6L3.4 9.3l6-.7L12 3z" />
+        </svg>
+      );
+    })}
+  </span>
+);
 
 export const ReviewCard = ({
   review,
   reviewerName = 'Anonymous',
   showFullDetails = false,
-  isOwner = false
+  isOwner = false,
 }: ReviewCardProps) => {
-  const getTierBadge = (tier: string) => {
-    switch (tier) {
-      case 'tier1':
-        return (
-          <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
-            Tier 1: Colleague
-          </span>
-        );
-      case 'tier2':
-        return (
-          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-            Tier 2: Industry
-          </span>
-        );
-      case 'tier3':
-        return (
-          <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">
-            Tier 3: Customer
-          </span>
-        );
-      default:
-        return null;
-    }
-  };
-
-  const getRelationshipText = (type: string) => {
-    const types: { [key: string]: string } = {
-      colleague: 'Colleague',
-      manager: 'Manager',
-      owner: 'Owner',
-      industry_peer: 'Industry Peer',
-      customer: 'Customer'
-    };
-    return types[type] || type;
-  };
+  const tier = TIER_LABEL[review.tier] ?? review.tier;
+  const relationship = RELATIONSHIP_LABEL[review.relationship.type] ?? review.relationship.type;
+  const pending = review.tier === 'tier1' && !review.relationship.verified;
 
   const shouldShowComment = () => {
-    // Owner sees comments from 4+ stars only
-    if (isOwner) {
-      return review.starRating >= 4 && review.comment;
-    }
-    // Employers (showFullDetails) see all comments
-    if (showFullDetails) {
-      return review.comment;
-    }
-    // Public view doesn't see comments
+    if (isOwner) return review.starRating >= 4 && review.comment;
+    if (showFullDetails) return review.comment;
     return false;
   };
 
+  const date = new Date(review.createdAt).toLocaleDateString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric',
+  });
+
   return (
-    <div className="border border-gray-200 rounded-lg p-4 bg-white">
-      {/* Header */}
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex-1">
-          {showFullDetails && (
-            <div className="font-medium text-[var(--color-coffee-text)] mb-1">
-              {reviewerName}
-            </div>
+    <article>
+      {/* Header line — quietly editorial */}
+      <header className="flex items-baseline justify-between gap-4 flex-wrap mb-3">
+        <div className="flex items-baseline gap-3 flex-wrap">
+          <p className="eyebrow text-[var(--color-accent)]">{tier}</p>
+          {showFullDetails && reviewerName && (
+            <span className="font-heading text-base">{reviewerName}</span>
           )}
-          <div className="flex items-center gap-2 flex-wrap">
-            {getTierBadge(review.tier)}
-            <span className="text-sm text-gray-600">
-              {getRelationshipText(review.relationship.type)} at {review.relationship.workplace}
+          <span className="text-sm text-[var(--color-ink-soft)]">
+            {relationship} · {review.relationship.workplace}
+          </span>
+          {pending && (
+            <span className="text-[10px] tracking-[0.18em] uppercase text-[var(--color-ink-soft)] border hairline rounded-full px-2 py-0.5">
+              Pending
             </span>
-            {!review.relationship.verified && review.tier === 'tier1' && (
-              <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
-                Pending Verification
-              </span>
-            )}
+          )}
+        </div>
+        <time className="text-xs text-[var(--color-ink-soft)] tracking-wide">{date}</time>
+      </header>
+
+      {/* Stars */}
+      {(showFullDetails || review.starRating >= 4) && (
+        <div className="flex items-center gap-2 mb-4">
+          <Stars value={review.starRating} />
+          <span className="text-xs text-[var(--color-ink-soft)]">{review.starRating}/5</span>
+        </div>
+      )}
+
+      {/* Badge tags — pill chips, hairline outline only */}
+      {review.badgeTags.length > 0 && (
+        <div className="mb-4">
+          <p className="eyebrow mb-2">Strengths</p>
+          <div className="flex flex-wrap gap-1.5">
+            {review.badgeTags.map((badgeId) => {
+              const badge = BADGES.find((b) => b.id === badgeId);
+              if (!badge) return null;
+              return (
+                <span
+                  key={badgeId}
+                  className="text-xs px-2.5 py-1 rounded-full border hairline text-[var(--color-ink)] bg-white"
+                >
+                  {badge.name}
+                </span>
+              );
+            })}
           </div>
         </div>
-        <div className="text-sm text-gray-500">
-          {new Date(review.createdAt).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-          })}
-        </div>
-      </div>
-
-      {/* Star Rating */}
-      {(showFullDetails || review.starRating >= 4) && (
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-yellow-400">
-            {'⭐'.repeat(review.starRating)}
-            <span className="text-gray-300">{'⭐'.repeat(5 - review.starRating)}</span>
-          </span>
-          <span className="text-sm text-gray-600">({review.starRating}/5)</span>
-        </div>
       )}
 
-      {/* Badge Tags */}
-      <div className="mb-3">
-        <h4 className="text-sm font-bold text-gray-700 mb-2">Strengths Highlighted:</h4>
-        <div className="flex flex-wrap gap-2">
-          {review.badgeTags.map(badgeId => {
-            const badge = BADGES.find(b => b.id === badgeId);
-            return badge ? (
-              <div
-                key={badgeId}
-                className="bg-[var(--color-coffee-accent)] bg-opacity-10 border border-[var(--color-coffee-accent)] px-3 py-1 rounded-full text-sm flex items-center gap-2"
-              >
-                <span>{badge.emoji}</span>
-                <span className="font-medium text-[var(--color-coffee-text)]">{badge.name}</span>
-              </div>
-            ) : null;
-          })}
-        </div>
-      </div>
-
-      {/* Comment */}
+      {/* Pull quote — only when shown */}
       {shouldShowComment() && (
-        <div className="bg-gray-50 rounded-lg p-3">
-          <p className="text-sm text-gray-700 italic">"{review.comment}"</p>
-        </div>
+        <blockquote className="pl-4 border-l-2 border-[var(--color-accent)] mt-2">
+          <p
+            className="font-heading italic text-lg leading-snug text-[var(--color-ink)]"
+            style={{ fontVariationSettings: '"opsz" 144' }}
+          >
+            &ldquo;{review.comment}&rdquo;
+          </p>
+        </blockquote>
       )}
 
-      {/* Review not visible to owner message */}
+      {/* Owner-only hidden-comment note */}
       {isOwner && review.starRating < 4 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-800">
-          💡 This review rated you under 4 stars. You can see the badge tags, but comments are
-          hidden to maintain our positive-first approach. Employers can see all feedback.
-        </div>
+        <p className="text-xs text-[var(--color-ink-soft)] mt-3 leading-relaxed">
+          Comments on reviews below four stars are kept private — only the strengths are shown here.
+          Hiring cafés see the full text.
+        </p>
       )}
-    </div>
+    </article>
   );
 };
